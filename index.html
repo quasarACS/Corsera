@@ -340,10 +340,13 @@ btnInstall.addEventListener('click', async () => {
 // Ocultar si ya está instalada (en modo standalone)
 if (window.matchMedia('(display-mode: standalone)').matches) {
     installBanner.classList.add('hidden');
-}    
+}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}        
     </script>
     <div id="install-banner" class="hidden">
-    <p>🚀 ¡Instala CORSERA para jugar en pantalla completa!</p>
+    <p>🚀 ¡Hola, instala CORSERA para jugar y tener una experiencia completa!</p>
     <button class="btn-install-now" id="btnInstall">INSTALAR AHORA</button>
 </div>
 </body>
