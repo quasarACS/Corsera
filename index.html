@@ -121,6 +121,45 @@
             border: none; padding: 15px 40px; border-radius: 50px;
             font-weight: bold; margin-top: 25px; cursor: pointer;
         }
+        #install-banner {
+    position: fixed;
+    bottom: 0; left: 0; width: 100%;
+    background: #1a1a1a;
+    border-top: 3px solid var(--primary-neon);
+    padding: 20px;
+    z-index: 9999;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+}
+
+.banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.banner-icon { font-size: 2rem; margin-right: 15px; }
+
+.banner-text { flex-grow: 1; text-align: left; }
+.banner-text strong { color: var(--accent-gold); display: block; font-size: 1rem; }
+.banner-text p { margin: 0; font-size: 0.8rem; color: #ccc; }
+
+.btn-install-v2 {
+    background: var(--primary-neon);
+    color: #000;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.btn-close-x {
+    background: none; border: none; color: #666;
+    margin-left: 15px; font-size: 1.2rem; cursor: pointer;
+}
     </style>
     <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
@@ -327,7 +366,57 @@ btnInstall.addEventListener('click', async () => {
 window.addEventListener('appinstalled', () => {
     console.log('¡CORSERA instalada con éxito!');
     installBanner.classList.add('hidden');
-});   
+});
+        let deferredPrompt;
+
+// Escuchar el evento de instalación de Chrome
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('Evento de instalación detectado');
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Solo mostrar si no está instalada
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+        document.getElementById('install-banner').style.display = 'block';
+    }
+});
+
+document.getElementById('btnInstall').addEventListener('click', async () => {
+    if (deferredPrompt) {
+        // Opción A: Instalación automática
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            document.getElementById('install-banner').style.display = 'none';
+        }
+        deferredPrompt = null;
+    } else {
+        // Opción B: Si el botón falla, guía a la niña
+        alert("¡Casi listo! Haz esto:\n1. Toca los 3 PUNTOS arriba a la derecha.\n2. Selecciona 'Instalar aplicación'.");
+        document.getElementById('install-banner').style.display = 'none';
+    }
+});
+
+// Ocultar si ya se instaló
+window.addEventListener('appinstalled', () => {
+    document.getElementById('install-banner').style.display = 'none';
+});
+
+// Registrar el Service Worker (OBLIGATORIO para que el botón funcione)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log("SW error", err));
+}
     </script>
+    <div id="install-banner" style="display:none;">
+    <div class="banner-content">
+        <div class="banner-icon">🚀</div>
+        <div class="banner-text">
+            <strong>¡INSTALA CORSERA!</strong>
+            <p>Juega en pantalla completa.</p>
+        </div>
+        <button id="btnInstall" class="btn-install-v2">INSTALAR</button>
+        <button onclick="document.getElementById('install-banner').style.display='none'" class="btn-close-x">✕</button>
+    </div>
+</div>
 </body>
 </html>
