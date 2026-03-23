@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CORSERA - Evaluación Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #020205;
+            --bg-card: #0a0e24;
+            --primary-neon: #00e5ff;
+            --accent-gold: #ffea00;
+            --success: #39ff14;
+            --error: #ff073a;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-dark);
+            color: white;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+        }
+
+        .studio-bg {
+            position: fixed; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 15% 15%, rgba(0, 229, 255, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 85% 85%, rgba(255, 234, 0, 0.15) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        .app-container {
+            width: 100%; max-width: 430px; height: 95vh;
+            background: var(--bg-card);
+            border: 2px solid #1a2244; border-radius: 30px;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 0 60px rgba(0,0,0,1); position: relative;
+        }
+
+        header {
+            background: rgba(0,0,0,0.9); padding: 15px;
+            border-bottom: 3px solid var(--primary-neon); text-align: center;
+        }
+
+        .logo-main {
+            font-family: 'Orbitron', sans-serif; color: white;
+            font-size: 2rem; letter-spacing: 4px;
+        }
+
+        #top-stats {
+            display: flex; justify-content: space-between;
+            padding: 12px 20px; background: rgba(255,255,255,0.05);
+            font-weight: bold; border-bottom: 1px solid #1a2244;
+        }
+
+        .points { color: var(--accent-gold); font-family: 'Orbitron'; font-size: 1rem; }
+        .target { color: var(--text-muted, #8b9bb4); font-size: 0.8rem; }
+
+        main { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
+
+        .question-box {
+            background: rgba(0,0,0,0.6); border-radius: 20px;
+            padding: 25px; border: 1px solid #1a2244; text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .word-box {
+            background: #000; border-left: 5px solid var(--accent-gold);
+            border-right: 5px solid var(--accent-gold);
+            padding: 25px; margin: 20px 0;
+            box-shadow: 0 0 20px rgba(255,234,0,0.1);
+        }
+
+        #word-display {
+            font-size: 3.5rem; margin: 0; color: white;
+            text-transform: uppercase; font-weight: 900;
+        }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+
+        .option-btn {
+            background: linear-gradient(180deg, #101633 0%, #05070f 100%);
+            border: 1px solid #1a2244; border-radius: 12px;
+            color: white; padding: 18px 25px; font-size: 1.2rem;
+            font-weight: bold; text-align: center; cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-btn:active { background: var(--primary-neon); color: black; }
+
+        footer { padding: 15px; text-align: center; }
+
+        .credits-trigger {
+            background: transparent; border: 1px solid #334488;
+            color: #8b9bb4; padding: 8px 20px; border-radius: 50px;
+            font-size: 0.7rem; cursor: pointer; text-transform: uppercase;
+        }
+
+        /* Overlays */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2,2,5,0.98); display: flex;
+            justify-content: center; align-items: center; z-index: 100;
+            text-align: center; padding: 30px; box-sizing: border-box;
+        }
+
+        .hidden { display: none; }
+
+        .feedback-card {
+            border: 2px solid; padding: 25px; border-radius: 20px;
+            background: #05070f; width: 100%;
+        }
+
+        .correct-border { border-color: var(--success); }
+        .error-border { border-color: var(--error); }
+
+        .btn-continue {
+            background: white; color: black;
+            border: none; padding: 15px 40px; border-radius: 50px;
+            font-weight: bold; margin-top: 25px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="studio-bg"></div>
+    <div class="app-container">
+        <header>
+            <span class="logo-main">CORSERA</span>
+
+            <button class="credits-trigger" onclick="toggleCredits()">Información del Creador</button>
+        </header>
+
+        <div id="top-stats">
+            <div class="points" id="points-display">PUNTOS: 0</div>
+            <div class="target">OBJETIVO: 10 PTS</div>
+        </div>
+
+        <main>
+            <div class="question-box">
+                <div class="word-box">
+                    <h2 id="word-display">...</h2>
+                </div>
+                <p id="pista-text" style="color: #8b9bb4;">¿Clasificación de la palabra?</p>
+            </div>
+
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkAnswer('Aguda')">AGUDA</button>
+                <button class="option-btn" onclick="checkAnswer('Grave')">GRAVE</button>
+                <button class="option-btn" onclick="checkAnswer('Esdrújula')">ESDRÚJULA</button>
+            </div>
+        </main>
+
+        <footer>
+            <button class="credits-trigger" onclick="toggleCredits()">Información del Autor</button>
+        </footer>
+
+        <div id="feedback-overlay" class="overlay hidden">
+            <div id="fb-card" class="feedback-card">
+                <h1 id="fb-title">¡TITULO!</h1>
+                <p id="fb-explanation" style="line-height: 1.6; margin: 20px 0;"></p>
+                <button id="btn-action" class="btn-continue" onclick="handleContinue()">CONTINUAR</button>
+            </div>
+        </div>
+
+        <div id="credits-overlay" class="overlay hidden">
+            <div class="feedback-card" style="border-color: var(--primary-neon);">
+                <h2 style="color:var(--primary-neon); font-family:'Orbitron';">¿Quién hizo el juego?</h2>
+                <p style="font-size: 1.2rem;"><b>Desarrollado por:</b><br>Anthonella Valentina Manrique Boada</p>
+                <p><b>Año cursando:</b> 2 año | Telematica</p>
+                <p><b>Institución:</b> Unidad Educativa Jose Alberto Hernandez Parra</p>
+                <hr style="border: 0; border-top: 1px solid #1a2244; margin: 20px 0;">
+                <p style="font-size: 0.8rem; color: #8b9bb4;">Caracas, Venezuela - 2026</p>
+                <button class="btn-continue" onclick="toggleCredits()">VOLVER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const words = [
+            { p: "Pabellón", t: "Aguda", e: "Es aguda porque la fuerza cae en la última sílaba. Como termina en 'n', lleva tilde." },
+            { p: "Arepa", t: "Grave", e: "Es grave porque la fuerza está en la penúltima sílaba. Al terminar en vocal, no se tilda." },
+            { p: "Mérida", t: "Esdrújula", e: "Es esdrújula. Siempre llevan tilde en la antepenúltima sílaba." },
+            { p: "Ratón", t: "Aguda", e: "Fuerza al final. Termina en 'n', por eso se tilda." },
+            { p: "Cachapa", t: "Grave", e: "Penúltima sílaba tónica. Sin tilde por terminar en vocal." },
+            { p: "Chévere", t: "Esdrújula", e: "Antepenúltima sílaba. ¡Siempre tildada!" },
+            { p: "Papel", t: "Aguda", e: "Fuerza al final, pero no se tilda porque no termina en n, s o vocal." },
+            { p: "Lápiz", t: "Grave", e: "Penúltima tónica. Lleva tilde porque termina en 'z' (distinto a n, s o vocal)." },
+            { p: "Sábado", t: "Esdrújula", e: "Esdrújula. Tónica en la antepenúltima." },
+            { p: "Café", t: "Aguda", e: "Aguda terminada en vocal. Siempre con tilde." },
+            { p: "Mesa", t: "Grave", e: "Grave terminada en vocal. Sin tilde." },
+            { p: "Pájaro", t: "Esdrújula", e: "Esdrújula clásica. Acento en la antepenúltima." }
+        ];
+
+        let currentIdx = 0;
+        let points = 0;
+        let errorsCount = 0;
+
+        function load() {
+            const w = words[currentIdx];
+            document.getElementById('word-display').innerText = w.p;
+        }
+
+        function checkAnswer(ans) {
+            const correct = words[currentIdx].t;
+            const explanation = words[currentIdx].e;
+            const ov = document.getElementById('feedback-overlay');
+            const card = document.getElementById('fb-card');
+            const title = document.getElementById('fb-title');
+            const expText = document.getElementById('fb-explanation');
+            
+            if (ans === correct) {
+                points++;
+                title.innerText = "+1 PUNTO ✅";
+                title.style.color = "var(--success)";
+                card.className = "feedback-card correct-border";
+                expText.innerText = explanation;
+            } else {
+                points = Math.max(0, points - 1);
+                errorsCount++;
+                title.innerText = "-1 PUNTO ❌";
+                title.style.color = "var(--error)";
+                card.className = "feedback-card error-border";
+                expText.innerText = "¡Error! " + explanation;
+            }
+            
+            document.getElementById('points-display').innerText = "PUNTOS: " + points;
+            ov.classList.remove('hidden');
+        }
+
+        function handleContinue() {
+            document.getElementById('feedback-overlay').classList.add('hidden');
+            
+            if (points >= 10) {
+                showFinalResult(true);
+                return;
+            }
+
+            currentIdx++;
+            if (currentIdx >= words.length) {
+                showFinalResult(false);
+            } else {
+                load();
+            }
+        }
+
+        function showFinalResult(win) {
+            const ov = document.getElementById('feedback-overlay');
+            const title = document.getElementById('fb-title');
+            const expText = document.getElementById('fb-explanation');
+            const btn = document.getElementById('btn-action');
+            
+            ov.classList.remove('hidden');
+            
+            if (win) {
+                title.innerText = "¡APROBADO! 🏆";
+                title.style.color = "var(--success)";
+                expText.innerText = "¡Excelente desempeño! Lograste los 10 puntos escolares requeridos, la profesora estará orgullosa. Dominas las reglas de acentuación.";
+            } else {
+                title.innerText = "REPROBADO 📉";
+                title.style.color = "var(--error)";
+                
+                // Análisis variable por "IA"
+                let consejo = "Sugerencia: Debes reforzar la identificación de la sílaba tónica. ";
+                if(errorsCount > 3) consejo += "Te sugiero practicar separando las palabras en sílabas y aplaudiendo en la más fuerte.";
+                else consejo += "Vas por buen camino, pero recuerda que las esdrújulas SIEMPRE se tildan.";
+                
+                expText.innerText = "No lograste los 10 puntos (Te faltaron " + (10 - points) + "). " + consejo;
+            }
+            
+            btn.innerText = "REINICIAR EVALUACIÓN";
+            btn.onclick = () => location.reload();
+        }
+
+        function toggleCredits() {
+            document.getElementById('credits-overlay').classList.toggle('hidden');
+        }
+
+        load();
+    </script>
+</body>
+</html>
