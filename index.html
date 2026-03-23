@@ -121,39 +121,6 @@
             border: none; padding: 15px 40px; border-radius: 50px;
             font-weight: bold; margin-top: 25px; cursor: pointer;
         }
-
-        #install-banner {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 400px;
-        background: linear-gradient(135deg, #00e5ff 0%, #0045ff 100%);
-        color: white;
-        padding: 15px;
-        border-radius: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        z-index: 2000;
-        text-align: center;
-    }
-
-        #install-banner p { margin: 0 0 10px 0; font-weight: bold; font-size: 0.9rem; }
-
-        .btn-install-now {
-        background: white;
-        color: #0045ff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 50px;
-        font-weight: 900;
-        cursor: pointer;
-        text-transform: uppercase;
-        width: 100%;
-    }
     </style>
     <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
@@ -362,9 +329,5 @@ window.addEventListener('appinstalled', () => {
     installBanner.classList.add('hidden');
 });   
     </script>
-    <div id="install-banner" class="hidden">
-    <p>🚀 ¡Instala CORSERA para jugar en pantalla completa!</p>
-    <button class="btn-install-now" id="btnInstall">¡¡Instalar Ahora!!</button>
-</div>
 </body>
 </html>
