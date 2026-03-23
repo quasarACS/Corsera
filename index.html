@@ -318,35 +318,52 @@
 const installBanner = document.getElementById('install-banner');
 const btnInstall = document.getElementById('btnInstall');
 
-// Captura el evento de instalación
+// 1. Detectar si YA está instalada o en modo App
+function checkIfInstalled() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isStandalone) {
+        installBanner.style.display = 'none'; // Ocultar por completo
+        console.log("Ya estás en modo App, ocultando banner.");
+    }
+}
+
+// Ejecutar detección al cargar
+checkIfInstalled();
+
+// 2. Capturar el evento de instalación (Solo funciona en algunos navegadores)
 window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // Evita que Chrome muestre su banner feo por defecto
+    console.log('Evento de instalación capturado');
+    e.preventDefault();
     deferredPrompt = e;
-    installBanner.classList.remove('hidden'); // Muestra nuestro banner pro
+    // Solo mostrar si NO está instalada
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+        installBanner.classList.remove('hidden');
+    }
 });
 
+// 3. Lógica del Botón
 btnInstall.addEventListener('click', async () => {
     if (deferredPrompt) {
-        deferredPrompt.prompt(); // Abre la ventana de instalación
+        deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('¡Corsera instalada!');
-        }
+        console.log(`Usuario eligió: ${outcome}`);
         deferredPrompt = null;
+        installBanner.classList.add('hidden');
+    } else {
+        // PLAN B: Si el botón no dispara nada, le damos instrucciones manuales
+        alert("¡Casi listo! Para instalar: Toca los 3 puntos de Chrome (arriba a la derecha) y selecciona 'Instalar aplicación'.");
         installBanner.classList.add('hidden');
     }
 });
 
-// Ocultar si ya está instalada (en modo standalone)
-if (window.matchMedia('(display-mode: standalone)').matches) {
+// 4. Ocultar el banner si el usuario ya instaló la app durante la sesión
+window.addEventListener('appinstalled', () => {
+    console.log('¡CORSERA instalada con éxito!');
     installBanner.classList.add('hidden');
-}
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}        
+});   
     </script>
     <div id="install-banner" class="hidden">
-    <p>🚀 ¡Hola, instala CORSERA para jugar y tener una experiencia completa!</p>
+    <p>🚀 ¡Instala CORSERA para jugar en pantalla completa!</p>
     <button class="btn-install-now" id="btnInstall">INSTALAR AHORA</button>
 </div>
 </body>
