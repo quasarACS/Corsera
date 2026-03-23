@@ -321,53 +321,6 @@
 
         load();
     let deferredPrompt;
-const installBanner = document.getElementById('install-banner');
-const btnInstall = document.getElementById('btnInstall');
-
-// 1. Detectar si YA está instalada o en modo App
-function checkIfInstalled() {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isStandalone) {
-        installBanner.style.display = 'none'; // Ocultar por completo
-        console.log("Ya estás en modo App, ocultando banner.");
-    }
-}
-
-// Ejecutar detección al cargar
-checkIfInstalled();
-
-// 2. Capturar el evento de instalación (Solo funciona en algunos navegadores)
-window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('Evento de instalación capturado');
-    e.preventDefault();
-    deferredPrompt = e;
-    // Solo mostrar si NO está instalada
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
-        installBanner.classList.remove('hidden');
-    }
-});
-
-// 3. Lógica del Botón
-btnInstall.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`Usuario eligió: ${outcome}`);
-        deferredPrompt = null;
-        installBanner.classList.add('hidden');
-    } else {
-        // PLAN B: Si el botón no dispara nada, le damos instrucciones manuales
-        alert("¡Casi listo! Para instalar: Toca los 3 puntos de Chrome (arriba a la derecha) y selecciona 'Instalar aplicación'.");
-        installBanner.classList.add('hidden');
-    }
-});
-
-// 4. Ocultar el banner si el usuario ya instaló la app durante la sesión
-window.addEventListener('appinstalled', () => {
-    console.log('¡CORSERA instalada con éxito!');
-    installBanner.classList.add('hidden');
-});
-        let deferredPrompt;
 
 // Escuchar el evento de instalación de Chrome
 window.addEventListener('beforeinstallprompt', (e) => {
